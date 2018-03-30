@@ -15,8 +15,9 @@ env:
     - CODE_COVERAGE_DIR=$SHIPPABLE_REPO_DIR/shippable/codecoverage
     - TESTS_LOC_DIR=$SHIPPABLE_REPO_DIR/tests
     - MOD_LOC=$SHIPPABLE_REPO_DIR/node_modules/.bin/
-    - DOCKER_REPO=ci-push-docker-hub
+    - DOCKER_REPO="node_app"
     - DOCKER_ACC=devopsrecipes # {account name}
+    - SHIP_IMG_RES=$DOCKER_REPO"_img_dh"
 
 build:
 
@@ -24,7 +25,7 @@ build:
   ci:
     # npm mirrors can sometimes be flacky, better to use shippable_retry
     # http://docs.shippable.com/ci/advancedOptions/retry/
-    - shippable_retry npm install
+    - shipctl retry "npm install"
     - mkdir -p $TEST_RESULTS_DIR && mkdir -p $CODE_COVERAGE_DIR
     - pushd $TESTS_LOC_DIR
     - $MOD_LOC/mocha --recursive "$TESTS_LOC_DIR/**/*.spec.js" -R mocha-junit-reporter --reporter-options mochaFile=$TEST_RESULTS_DIR/testresults.xml
@@ -40,6 +41,7 @@ build:
   #this will be ignored if you are not using Assembly Lines to trigger another job after ci  
   on_success:
     - shipctl put_resource_state $JOB_NAME versionName $BRANCH.$BUILD_NUMBER
+    - shipctl put_resource_state $SHIP_IMG_RES versionName $BRANCH.$BUILD_NUMBER
 #    - echo "versionName=$BRANCH.$BUILD_NUMBER" >> $JOB_STATE/demo_doc_img.env
 
 # Integrations are used to connect external resources to CI
@@ -53,20 +55,20 @@ integrations:
 
 ## OPTIONAL : In case you want to use this image in CD Assembly Lines
 resources:
-  - name: ci_app_img
+  - name: node_app_img_dh
     type: image
     integration: drship_dockerhub # replace with your integration name
     versionTemplate:
-      sourceName: "devopsrecipes/app_be" # replace with your Hub URL
+      sourceName: "devopsrecipes/node_app" # replace with your Hub URL
       isPull: false
       versionName: latest
 
 jobs:
-  - name: app_be_runCI
+  - name: node_app_runCI
     type: runCI
     dependencyMode: strict
     triggerMode: parallel
     steps:
-      - OUT: app_be_img
+      - OUT: node_app_img_dh
     flags:
-      - be
+      - node_app
