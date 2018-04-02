@@ -37,8 +37,8 @@ function normalizePort(val) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
-    // named pipe
-    return val;
+    // port is not specified in an environment variable
+    return 80;
   }
 
   if (port >= 0) {
