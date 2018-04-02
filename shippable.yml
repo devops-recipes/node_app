@@ -45,9 +45,9 @@ build:
   # http://docs.shippable.com/ci/shippableyml/#post_ci
   post_ci:
     - docker build -t $DOCKER_ACC/$DOCKER_REPO:$BRANCH.$BUILD_NUMBER .
-    - docker push $DOCKER_ACC/$DOCKER_REPO:$BRANCH.$BUILD_NUMBER
-    
-  #this will be ignored if you are not using Assembly Lines to trigger another job after ci  
+    - if [ "$IS_PULL_REQUEST" != true ]; then docker push $DOCKER_ACC/$DOCKER_REPO:$BRANCH.$BUILD_NUMBER; fi
+
+  #this will be ignored if you are not using Assembly Lines to trigger another job after ci
   on_success:
     - shipctl put_resource_state $SHIP_IMG_RES versionName $BRANCH.$BUILD_NUMBER
 
