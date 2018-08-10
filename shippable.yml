@@ -7,7 +7,7 @@ integrations:
   # adding docker hub integration so that credentials are available to CI Job
   # http://docs.shippable.com/platform/integration/dockerRegistryLogin/
   hub:
-    - integrationName: drship_dockerhub
+    - integrationName: dr_dockerhub
       type: dockerRegistryLogin
 
 # use this to control what branches get built.
@@ -55,7 +55,7 @@ build:
 resources:
   - name: node_app_img_dh
     type: image
-    integration: drship_dockerhub # replace with your integration name
+    integration: dr_dockerhub # replace with your integration name
     versionTemplate:
       sourceName: "devopsrecipes/node_app" # replace with your Hub URL
       isPull: false
